@@ -1,12 +1,7 @@
 {
-  "name": "Filtre Alphabétique Automatique",
+  "name": "Alphabetical Topics",
   "component": true,
-  "license_url": null,
-  "about_url": null,
-  "authors": "Votre Nom",
-  "theme_version": null,
-  "minimum_discourse_version": null,
-  "maximum_discourse_version": null,
-  "assets": {},
-  "color_schemes": {}
+  "license_url": "https://opensource.org/licenses/MIT",
+  "about_url": "",
+  "assets": {}
 }
