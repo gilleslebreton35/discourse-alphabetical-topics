@@ -1,5 +1,4 @@
-categories_cible:
+alphabetical_categories:
+  type: category_list
   default: ""
-  type: list
-  description: "Liste des slugs de catégories (séparés par |) ciblées par le tri A→Z. Exemple : docs|faq"
-  refresh: true
+  description: "Catégories dans lesquelles afficher les sujets par ordre alphabétique."
