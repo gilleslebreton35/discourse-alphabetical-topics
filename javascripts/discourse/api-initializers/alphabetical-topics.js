@@ -105,12 +105,19 @@ export default {
         // Vérification du contexte de la route (catégorie)
         if (route?.name?.startsWith("discovery.category")) {
           const category = route.attributes?.category;
-          const targetCategoryIds = (settings.alphabetical_categories || "")
+          
+          // Récupère la liste des catégories depuis les paramètres
+          const targetCategories = (settings.alphabetical_categories || "")
             .split("|")
-            .map((id) => parseInt(id, 10))
+            .map((val) => val.trim().toLowerCase())
             .filter(Boolean);
 
-          if (category && targetCategoryIds.includes(category.id)) {
+          // Vérifie si la catégorie actuelle correspond à un ID ou un slug (nom) de la liste
+          if (
+            category && 
+            (targetCategories.includes(String(category.id)) || 
+             targetCategories.includes(category.slug.toLowerCase()))
+          ) {
             loadAllDocTopics(api).then(() => {
               sortDocCategoryTopicLists();
             });
