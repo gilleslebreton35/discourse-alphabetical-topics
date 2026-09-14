@@ -1,4 +1,4 @@
 alphabetical_categories:
-  type: category_list
+  type: list
   default: ""
-  description: "Catégories dans lesquelles afficher les sujets par ordre alphabétique."
+  description: "Entrez l'ID ou le nom (slug) des catégories à trier (ex: 5 ou documentation). Appuyez sur Entrée après chaque ajout."
