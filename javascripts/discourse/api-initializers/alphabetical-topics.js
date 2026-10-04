@@ -1,10 +1,9 @@
 import { withPluginApi } from "discourse/lib/plugin-api";
 
-const MAX_DOC_PAGES = 12; // ~360 sujets
+const MAX_DOC_PAGES = 12;
 let docLoadRun = 0;
 let docSortObservers = new Map();
 
-// Charge silencieusement les pages suivantes de la catégorie
 async function loadAllDocTopics(api) {
   const run = ++docLoadRun;
   const list = api.container.lookup("controller:discovery/latest")?.model;
@@ -28,7 +27,10 @@ async function loadAllDocTopics(api) {
 
 function docSortLocale() {
   const lang = document.documentElement.lang;
-  if (!lang) return undefined;
+  if (!lang) {
+    return undefined;
+  }
+
   try {
     Intl.getCanonicalLocales(lang);
     return lang;
@@ -37,10 +39,11 @@ function docSortLocale() {
   }
 }
 
-// Réorganise physiquement les nœuds DOM pour respecter le CSS Grid/Flex (tuiles)
 function sortDocTopicList(body, locale) {
   const rows = [...body.querySelectorAll(":scope > .topic-list-item")];
-  if (rows.length < 2) return;
+  if (rows.length < 2) {
+    return;
+  }
 
   const sorted = [...rows].sort((a, b) => {
     const titleA = a.querySelector(".title")?.textContent.trim() ?? "";
@@ -49,7 +52,7 @@ function sortDocTopicList(body, locale) {
   });
 
   if (sorted.every((row, i) => rows[i] === row)) {
-    return; 
+    return;
   }
 
   const anchor = rows[rows.length - 1].nextSibling;
@@ -99,34 +102,26 @@ export default {
         const router = container.lookup("service:router");
         const route = router.currentRoute;
 
-        // Si on quitte une catégorie, on coupe les observateurs pour ne pas perturber les autres pages
-        if (!route?.name?.startsWith("discovery.category")) {
-          docSortObservers.forEach((observer) => observer.disconnect());
-          docSortObservers = new Map();
-          return;
-        }
+        // Vérification du contexte de la route (catégorie)
+        if (route?.name?.startsWith("discovery.category")) {
+          const category = route.attributes?.category;
+          
+          // Récupère la liste des catégories depuis les paramètres
+          const targetCategories = (settings.alphabetical_categories || "")
+            .split("|")
+            .map((val) => val.trim().toLowerCase())
+            .filter(Boolean);
 
-        const category = route.attributes?.category;
-        
-        // Récupère la liste des catégories à cibler (géré via settings.yaml)
-        const targetCategories = (settings.alphabetical_categories || "")
-          .split("|")
-          .map((val) => val.trim().toLowerCase())
-          .filter(Boolean);
-
-        if (
-          category && 
-          (targetCategories.includes(String(category.id)) || 
-           targetCategories.includes(category.slug.toLowerCase()))
-        ) {
-          // On est dans la bonne catégorie : on charge tout et on trie les tuiles !
-          loadAllDocTopics(api).then(() => {
-            sortDocCategoryTopicLists();
-          });
-        } else {
-          // Désactive le tri si on rentre dans une catégorie non-ciblée
-          docSortObservers.forEach((observer) => observer.disconnect());
-          docSortObservers = new Map();
+          // Vérifie si la catégorie actuelle correspond à un ID ou un slug (nom) de la liste
+          if (
+            category && 
+            (targetCategories.includes(String(category.id)) || 
+             targetCategories.includes(category.slug.toLowerCase()))
+          ) {
+            loadAllDocTopics(api).then(() => {
+              sortDocCategoryTopicLists();
+            });
+          }
         }
       });
     });
